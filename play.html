@@ -1,6 +1,7 @@
 <html>
 <head>
   <title>Local RTC</title>
+  <script type="text/javascript" src="/static/config.js"></script>
   <script type="text/javascript" src="/static/jquery.min.js"></script>
   <script type="text/javascript" src="/static/peer.min.js"></script>
   <script type="text/javascript" src="/static/randnames.js"></script>
@@ -55,7 +56,7 @@
   var conn;
   var peerName = randomName()
   var peer = new Peer(peerName, {
-    host: "192.168.1.219",
+    host: config.host,
     port: 9000,
     path: '/peerjs',
     debug: 3
