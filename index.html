@@ -1,0 +1,132 @@
+<html>
+<head>
+  <title>Local RTC</title>
+  <script type="text/javascript" src="/static/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/peer.min.js"></script>
+  <script type="text/javascript" src="/static/randnames.js"></script>
+
+  <style>
+    #stream-btn {
+      background-color: rgb(156, 111, 189);
+      color: white;
+      font-size: 32px;
+      border-radius: 12px;
+      padding: 10px 25px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #stream-btn:hover {
+      background-color: rgb(136, 81, 175);
+    }
+
+    #stream-btn.active {
+      background-color: rgb(197, 66, 66);
+    }
+
+    #stream-btn.active:hover {
+      background-color: rgb(136, 41, 41);
+    }
+
+    video {
+      background-color: black;
+      width: 95vw;
+      height: 80vh;
+    }
+
+    .center {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="pure-g">
+    <div class="center">
+      <video id="stream-vid" playsinline autoplay muted></video>
+    </div>
+    <br/><br/>
+    <div class="center">
+      <button id="stream-btn">Start Streaming</button>
+    </div>
+  </div>
+</body>
+
+<script>
+  var stream = null;
+  var streamActive = false;
+  $('#stream-btn').on('click', function(e) {
+    streamActive = !streamActive;
+    $(this).toggleClass("active")
+    $(this).html(streamActive ? "Stop Streaming" : "Start Streaming")
+
+    if (streamActive) {
+      getStream();
+    } else {
+      stopStream(stream)
+    }
+  });
+
+  function stopStream(avStream) {
+    if (avStream != null) {
+        const tracks = avStream.getTracks();
+        tracks.forEach((track) => track.stop());
+    }
+  }
+
+  function getStream() {
+    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(av => {
+      stream = av;
+      document.getElementById("stream-vid").srcObject = stream
+    })
+  }
+</script>
+
+<script>
+  var peer = new Peer('streamer', {
+        host: "192.168.1.219",
+        port: 9000,
+        path: '/peerjs',
+        debug: 3
+    });
+
+  var connectedPeers = []
+
+  // const peer = new Peer('streamer', {
+  //   host: '192.168.1.219',
+  //   port: 9000,
+  // });
+
+  peer.on('connection', function(conn) {
+    console.log("Connected!!", conn.peer)
+    // conn
+    callClient(conn.peer)
+  });
+
+  function callClient(peerId) {
+    // connection
+    var call = peer.call(peerId, stream);
+    call.on('stream', function(remoteStream) {
+      // Show stream in some video/canvas element.
+      console.log("connected peer")
+    });
+  }
+
+  // peer.on('message', function(data) {
+  //   console.log("Got data ", data)
+  // })
+
+  // // navigator.mediaDevices.getUserMedia({video: true, audio: true}, (stream) => {
+  // const call = peer.call('another-peers-id', stream);
+  // call.on('stream', (remoteStream) => {
+  //     // Show stream in some <video> element.
+  //   });
+  // }, (err) => {
+  //   console.error('Failed to get local stream', err);
+  // });
+
+</script>
+</html>

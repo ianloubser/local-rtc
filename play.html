@@ -1,0 +1,90 @@
+<html>
+<head>
+  <title>Local RTC</title>
+  <script type="text/javascript" src="/static/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/peer.min.js"></script>
+  <script type="text/javascript" src="/static/randnames.js"></script>
+
+  <style>
+    video {
+      background-color: black;
+      width: 95vw;
+      height: 80vh;
+    }
+
+    #stream-btn {
+      background-color: rgb(156, 111, 189);
+      color: white;
+      font-size: 32px;
+      border-radius: 12px;
+      padding: 10px 25px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #stream-btn:hover {
+      background-color: rgb(136, 81, 175);
+    }
+
+    #stream-btn.active {
+      background-color: rgb(197, 66, 66);
+    }
+
+    #stream-btn.active:hover {
+      background-color: rgb(136, 41, 41);
+    }
+
+    .center {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <video id="playback" autoplay controls></video>
+  </div>
+  <br/><br/><br/>
+  <div class="center">
+    <button id="stream-btn" onclick="toggle();">Connect</button>
+  </div>
+</body>
+
+<script>
+  var conn;
+  var peerName = randomName()
+  var peer = new Peer(peerName, {
+    host: "192.168.1.219",
+    port: 9000,
+    path: '/peerjs',
+    debug: 3
+  });
+
+  peer.on('connection', function(conn) {
+    console.log("connected!!!")
+    conn.on('data', function(data){
+      // Will print 'hi!'
+      console.log('heyyoooo', data);
+    });
+  });
+
+  peer.on('call', function(call) {
+    console.log("Got a call!!")
+    call.answer(null); // Answer the call with an A/V stream.
+    call.on('stream', function(remoteStream) {
+      // Show stream in some video/canvas element.
+      document.getElementById("playback").srcObject = remoteStream
+    });
+  });
+
+  function toggle() {
+    conn = peer.connect("streamer")
+    conn.on('open', function() {
+      // Send messages
+      conn.send('CALL ME');
+    });
+  }
+
+</script>
+</html>
