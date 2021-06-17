@@ -1,0 +1,26 @@
+{
+  "name": "local-rtc",
+  "version": "1.0.0",
+  "description": "Stream realtime video on your local network",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "peer": "^0.6.1"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.0"
+  },
+  "scripts": {
+    "start": "concurrently \"node server.js\" \"node broker.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ianloubser/local-rtc.git"
+  },
+  "author": "Ian Loubser",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ianloubser/local-rtc/issues"
+  },
+  "homepage": "https://github.com/ianloubser/local-rtc#readme"
+}
